@@ -1,5 +1,24 @@
 ## Angular Lib for OpenID Connect/OAuth2 Changelog
 
+### 2026-05-28 21.0.3
+
+- Make offline_access refresh-token warning configurable
+  - [PR](https://github.com/damienbod/angular-auth-oidc-client/pull/2187)
+- Fix: don't send code_challenge in PAR flow when disablePkce is true
+  - [PR](https://github.com/damienbod/angular-auth-oidc-client/pull/2209)
+- test: convert validation specs to await firstValueFrom
+  - [PR](https://github.com/damienbod/angular-auth-oidc-client/pull/2215)
+- fix(public) : Export PopupResult to public
+  - [PR](https://github.com/damienbod/angular-auth-oidc-client/pull/2166)
+- chore: sync package-lock.json with package.json
+  - [PR](https://github.com/damienbod/angular-auth-oidc-client/pull/2214)
+- docs: fix typos, broken links, and invalid Docusaurus directive
+  - [PR](https://github.com/damienbod/angular-auth-oidc-client/pull/2213)
+- ci: build docs only on push to main, not on PRs
+  - [PR](https://github.com/damienbod/angular-auth-oidc-client/pull/2210)
+- fix(check-session): require exact origin match in postMessage handler
+  - [PR](https://github.com/damienbod/angular-auth-oidc-client/pull/2217)
+
 ### 2026-05-01 21.0.2
 
 - Update packages
