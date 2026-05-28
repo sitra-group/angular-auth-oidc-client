@@ -392,11 +392,7 @@ export class UrlService {
       'Authorize created. adding myautostate: ' + state
     );
 
-    // code_challenge with "S256"
-    const codeVerifier =
-      this.flowsDataService.createCodeVerifier(configuration);
-
-    return this.jwtWindowCryptoService.generateCodeChallenge(codeVerifier).pipe(
+    return this.getCodeChallenge(configuration).pipe(
       map((codeChallenge: string) => {
         const {
           clientId,
@@ -413,8 +409,11 @@ export class UrlService {
         params = params.append('scope', scope ?? '');
         params = params.append('nonce', nonce);
         params = params.append('state', state);
-        params = params.append('code_challenge', codeChallenge);
-        params = params.append('code_challenge_method', 'S256');
+
+        if (!configuration.disablePkce) {
+          params = params.append('code_challenge', codeChallenge);
+          params = params.append('code_challenge_method', 'S256');
+        }
 
         if (hdParam) {
           params = params.append('hd', hdParam);
