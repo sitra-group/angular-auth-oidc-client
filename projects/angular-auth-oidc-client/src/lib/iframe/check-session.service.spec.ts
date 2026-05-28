@@ -356,6 +356,108 @@ describe('CheckSessionService', () => {
     });
   });
 
+  describe('messageHandler', () => {
+    const fakeIframe = {
+      contentWindow: { id: 'fake-iframe-content-window' },
+    } as any;
+    let eventService: PublicEventsService;
+    let serviceAsAny: any;
+
+    beforeEach(() => {
+      eventService = TestBed.inject(PublicEventsService);
+      serviceAsAny = checkSessionService as any;
+      spyOn(serviceAsAny, 'getExistingIframe').and.returnValue(fakeIframe);
+    });
+
+    function messageEvent(overrides: Partial<MessageEvent> = {}): MessageEvent {
+      return {
+        origin: 'https://idp.example.com',
+        source: fakeIframe.contentWindow,
+        data: 'changed',
+        ...overrides,
+      } as MessageEvent;
+    }
+
+    it('processes the message when e.origin exactly matches the origin of checkSessionIframe', () => {
+      spyOn(storagePersistenceService, 'read').and.returnValue({
+        checkSessionIframe: 'https://idp.example.com/connect/checksession',
+      });
+      const fireEventSpy = spyOn(eventService, 'fireEvent');
+
+      serviceAsAny.messageHandler({ configId: 'configId1' }, messageEvent());
+
+      expect(fireEventSpy).toHaveBeenCalled();
+    });
+
+    it('rejects the message when e.origin is only a prefix substring of checkSessionIframe (typosquat regression)', () => {
+      // Real-world risk: an attacker registers idp.example.co (one char short of
+      // idp.example.com) and tricks the iframe into loading from there. With the
+      // old startsWith check this passes because the configured URL string starts
+      // with the attacker's shorter origin. With exact-origin equality it fails.
+      spyOn(storagePersistenceService, 'read').and.returnValue({
+        checkSessionIframe: 'https://idp.example.com/connect/checksession',
+      });
+      const fireEventSpy = spyOn(eventService, 'fireEvent');
+
+      serviceAsAny.messageHandler(
+        { configId: 'configId1' },
+        messageEvent({ origin: 'https://idp.example.co' })
+      );
+
+      expect(fireEventSpy).not.toHaveBeenCalled();
+    });
+
+    it('rejects the message when e.origin is an unrelated host', () => {
+      spyOn(storagePersistenceService, 'read').and.returnValue({
+        checkSessionIframe: 'https://idp.example.com/checksession',
+      });
+      const fireEventSpy = spyOn(eventService, 'fireEvent');
+
+      serviceAsAny.messageHandler(
+        { configId: 'configId1' },
+        messageEvent({ origin: 'https://attacker.example' })
+      );
+
+      expect(fireEventSpy).not.toHaveBeenCalled();
+    });
+
+    it('rejects the message when checkSessionIframe is missing', () => {
+      spyOn(storagePersistenceService, 'read').and.returnValue({
+        checkSessionIframe: undefined,
+      });
+      const fireEventSpy = spyOn(eventService, 'fireEvent');
+
+      serviceAsAny.messageHandler({ configId: 'configId1' }, messageEvent());
+
+      expect(fireEventSpy).not.toHaveBeenCalled();
+    });
+
+    it('rejects the message when checkSessionIframe is a malformed URL', () => {
+      spyOn(storagePersistenceService, 'read').and.returnValue({
+        checkSessionIframe: 'not a valid url',
+      });
+      const fireEventSpy = spyOn(eventService, 'fireEvent');
+
+      serviceAsAny.messageHandler({ configId: 'configId1' }, messageEvent());
+
+      expect(fireEventSpy).not.toHaveBeenCalled();
+    });
+
+    it('rejects the message when e.source is not the existing iframe (defense in depth)', () => {
+      spyOn(storagePersistenceService, 'read').and.returnValue({
+        checkSessionIframe: 'https://idp.example.com/checksession',
+      });
+      const fireEventSpy = spyOn(eventService, 'fireEvent');
+
+      serviceAsAny.messageHandler(
+        { configId: 'configId1' },
+        messageEvent({ source: { id: 'some-other-window' } as any })
+      );
+
+      expect(fireEventSpy).not.toHaveBeenCalled();
+    });
+  });
+
   describe('isCheckSessionConfigured', () => {
     it('returns true if startCheckSession on config is true', () => {
       const config = { configId: 'configId1', startCheckSession: true };      const result = checkSessionService.isCheckSessionConfigured(config);

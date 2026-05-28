@@ -243,15 +243,17 @@ export class CheckSessionService implements OnDestroy {
       'authWellKnownEndPoints',
       configuration
     );
-    const startsWith = !!authWellKnownEndPoints?.checkSessionIframe?.startsWith(
-      e.origin
+    const expectedOrigin = this.getOriginOrNull(
+      authWellKnownEndPoints?.checkSessionIframe
     );
+    const originMatches =
+      expectedOrigin !== null && e.origin === expectedOrigin;
 
     this.outstandingMessages = 0;
 
     if (
       existingIFrame &&
-      startsWith &&
+      originMatches &&
       e.source === existingIFrame.contentWindow
     ) {
       if (e.data === 'error') {
@@ -312,5 +314,16 @@ export class CheckSessionService implements OnDestroy {
         configuration
       )
     );
+  }
+
+  private getOriginOrNull(url: string | undefined | null): string | null {
+    if (!url) {
+      return null;
+    }
+    try {
+      return new URL(url).origin;
+    } catch {
+      return null;
+    }
   }
 }
