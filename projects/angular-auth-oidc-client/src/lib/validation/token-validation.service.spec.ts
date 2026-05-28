@@ -1,5 +1,5 @@
-import { TestBed, waitForAsync } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { TestBed } from '@angular/core/testing';
+import { firstValueFrom, of } from 'rxjs';
 import { mockProvider } from '../../test/auto-mock';
 import { JwkExtractor } from '../extractors/jwk.extractor';
 import { LoggerService } from '../logging/logger.service';
@@ -481,77 +481,73 @@ describe('TokenValidationService', () => {
   });
 
   describe('validateSignatureIdToken', () => {
-    it('returns false if no kwtKeys are passed', waitForAsync(() => {
-      const valueFalse$ = tokenValidationService.validateSignatureIdToken(
-        'some-id-token',
-        null,
-        { configId: 'configId1' }
+    it('returns false if no kwtKeys are passed', async () => {
+      const valueFalse = await firstValueFrom(
+        tokenValidationService.validateSignatureIdToken(
+          'some-id-token',
+          null,
+          { configId: 'configId1' }
+        )
       );
 
-      valueFalse$.subscribe((valueFalse) => {
-        expect(valueFalse).toEqual(false);
-      });
-    }));
+      expect(valueFalse).toEqual(false);
+    });
 
-    it('returns true if no idToken is passed', waitForAsync(() => {
-      const valueFalse$ = tokenValidationService.validateSignatureIdToken(
-        null as any,
-        'some-jwt-keys',
-        { configId: 'configId1' }
+    it('returns true if no idToken is passed', async () => {
+      const valueFalse = await firstValueFrom(
+        tokenValidationService.validateSignatureIdToken(
+          null as any,
+          'some-jwt-keys',
+          { configId: 'configId1' }
+        )
       );
 
-      valueFalse$.subscribe((valueFalse) => {
-        expect(valueFalse).toEqual(true);
-      });
-    }));
+      expect(valueFalse).toEqual(true);
+    });
 
-    it('returns false if jwtkeys has no keys-property', waitForAsync(() => {
-      const valueFalse$ = tokenValidationService.validateSignatureIdToken(
-        'some-id-token',
-        { notKeys: '' },
-        { configId: 'configId1' }
+    it('returns false if jwtkeys has no keys-property', async () => {
+      const valueFalse = await firstValueFrom(
+        tokenValidationService.validateSignatureIdToken(
+          'some-id-token',
+          { notKeys: '' },
+          { configId: 'configId1' }
+        )
       );
 
-      valueFalse$.subscribe((valueFalse) => {
-        expect(valueFalse).toEqual(false);
-      });
-    }));
+      expect(valueFalse).toEqual(false);
+    });
 
-    it('returns false if header data has no header data', waitForAsync(() => {
+    it('returns false if header data has no header data', async () => {
       spyOn(tokenHelperService, 'getHeaderFromToken').and.returnValue({});
 
-      const jwtKeys = {
-        keys: 'someThing',
-      };
-      const valueFalse$ = tokenValidationService.validateSignatureIdToken(
-        'some-id-token',
-        jwtKeys,
-        { configId: 'configId1' }
+      const jwtKeys = { keys: 'someThing' };
+      const valueFalse = await firstValueFrom(
+        tokenValidationService.validateSignatureIdToken(
+          'some-id-token',
+          jwtKeys,
+          { configId: 'configId1' }
+        )
       );
 
-      valueFalse$.subscribe((valueFalse) => {
-        expect(valueFalse).toEqual(false);
-      });
-    }));
+      expect(valueFalse).toEqual(false);
+    });
 
-    it('returns false if header data alg property does not exist in keyalgorithms', waitForAsync(() => {
+    it('returns false if header data alg property does not exist in keyalgorithms', async () => {
       spyOn(tokenHelperService, 'getHeaderFromToken').and.returnValue({
         alg: 'NOT SUPPORTED ALG',
       });
 
-      const jwtKeys = {
-        keys: 'someThing',
-      };
-      const valueFalse$ = tokenValidationService.validateSignatureIdToken(
-        'some-id-token',
-        jwtKeys,
-        { configId: 'configId1' }
+      const jwtKeys = { keys: 'someThing' };
+      const valueFalse = await firstValueFrom(
+        tokenValidationService.validateSignatureIdToken(
+          'some-id-token',
+          jwtKeys,
+          { configId: 'configId1' }
+        )
       );
 
-      valueFalse$.subscribe((valueFalse) => {
-        expect(valueFalse).toEqual(false);
-      });
-    }));
+      expect(valueFalse).toEqual(false);
+    });
 
     it('returns false if header data has kid property and jwtKeys has same kid property but they are not valid with the token', (done) => {
       const kid = '5626CE6A8F4F5FCD79C6642345282CA76D337548';

@@ -1,4 +1,5 @@
-import { TestBed, waitForAsync } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
+import { firstValueFrom } from 'rxjs';
 import { CryptoService } from '../utils/crypto/crypto.service';
 import { JwtWindowCryptoService } from './jwt-window-crypto.service';
 
@@ -21,15 +22,13 @@ describe('JwtWindowCryptoService', () => {
   });
 
   describe('generateCodeChallenge', () => {
-    it('returns good result with correct codeVerifier', waitForAsync(() => {
+    it('returns good result with correct codeVerifier', async () => {
       const outcome = 'R2TWD45Vtcf_kfAqjuE3LMSRF3JDE5fsFndnn6-a0nQ';
-      const observable = service.generateCodeChallenge(
-        '44445543344242132145455aaabbdc3b4'
+      const value = await firstValueFrom(
+        service.generateCodeChallenge('44445543344242132145455aaabbdc3b4')
       );
 
-      observable.subscribe((value) => {
-        expect(value).toBe(outcome);
-      });
-    }));
+      expect(value).toBe(outcome);
+    });
   });
 });
