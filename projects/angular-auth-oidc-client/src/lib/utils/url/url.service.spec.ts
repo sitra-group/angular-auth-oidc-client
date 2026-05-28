@@ -1397,6 +1397,43 @@ describe('UrlService Tests', () => {
         );
       });
     }));
+
+    it('omits code_challenge and code_challenge_method when disablePkce is true', waitForAsync(() => {
+      const config = {
+        clientId: 'testClientId',
+        responseType: 'testResponseType',
+        scope: 'testScope',
+        hdParam: undefined,
+        customParamsAuthRequest: undefined,
+        redirectUrl: 'testRedirectUrl',
+        disablePkce: true,
+      };
+
+      spyOn(
+        flowsDataService,
+        'getExistingOrCreateAuthStateControl'
+      ).and.returnValue('testState');
+      spyOn(flowsDataService, 'createNonce').and.returnValue('testNonce');
+      const createCodeVerifierSpy = spyOn(
+        flowsDataService,
+        'createCodeVerifier'
+      ).and.returnValue('testCodeVerifier');
+      const generateCodeChallengeSpy = spyOn(
+        jwtWindowCryptoService,
+        'generateCodeChallenge'
+      ).and.returnValue(of('testCodeChallenge'));
+      const resultObs$ = service.createBodyForParCodeFlowRequest(config);
+
+      resultObs$.subscribe((result) => {
+        expect(result).toBe(
+          `client_id=testClientId&redirect_uri=testRedirectUrl&response_type=testResponseType&scope=testScope&nonce=testNonce&state=testState`
+        );
+        expect(result).not.toContain('code_challenge');
+        expect(result).not.toContain('code_challenge_method');
+        expect(createCodeVerifierSpy).not.toHaveBeenCalled();
+        expect(generateCodeChallengeSpy).not.toHaveBeenCalled();
+      });
+    }));
   });
 
   describe('createUrlImplicitFlowWithSilentRenew', () => {
