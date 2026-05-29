@@ -57,13 +57,6 @@ export class PopUpService {
     config: OpenIdConfiguration
   ): void {
     const optionsToPass = this.getOptions(popupOptions);
-
-    this.storagePersistenceService.write(
-      this.STORAGE_IDENTIFIER,
-      'true',
-      config
-    );
-
     const windowIdentifier = this.windowInternal;
 
     if (!windowIdentifier) {
@@ -75,6 +68,12 @@ export class PopUpService {
 
       return;
     }
+
+    this.storagePersistenceService.write(
+      this.STORAGE_IDENTIFIER,
+      'true',
+      config
+    );
 
     this.popUp = windowIdentifier.open(url, '_blank', optionsToPass);
 
@@ -132,7 +131,10 @@ export class PopUpService {
     }
   }
 
-  private cleanUp(listener: any, config: OpenIdConfiguration): void {
+  private cleanUp(
+    listener: (event: MessageEvent) => void,
+    config: OpenIdConfiguration
+  ): void {
     const windowIdentifier = this.windowInternal;
 
     if (!windowIdentifier) {
