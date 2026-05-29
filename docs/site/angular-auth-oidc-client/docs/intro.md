@@ -94,7 +94,13 @@ export class AppModule {}
 
 ## Login and Logout
 
-Make sure the login is checked at the beginning of your app (for example in the `app.component.ts`). The `OidcSecurityService` provides everything you need to login/logout your users.
+The library distinguishes between two operations that are called at very different moments. Knowing which one to call when is the most important thing to understand:
+
+- **`checkAuth()`** — call **once on every app load** (typically from your root component's `ngOnInit`). It bootstraps the library: processes the callback if the user has just returned from the identity provider, restores any existing session from storage so a page refresh keeps the user signed in, and starts silent token renewal if configured. It does **not** redirect the user. The returned `Observable<LoginResponse>` tells you whether the user is authenticated.
+
+- **`authorize()`** — call when the user *initiates* a login (clicks a "Sign in" button, or an auth guard demands authentication). It redirects the browser to the identity provider's login page.
+
+A typical app shape:
 
 ```ts
 import { OidcSecurityService } from 'angular-auth-oidc-client';
@@ -106,10 +112,13 @@ export class AppComponent implements OnInit {
   private readonly oidcSecurityService = inject(OidcSecurityService);
 
   ngOnInit() {
+    // Bootstrap on every page load. Handles the IdP callback,
+    // restores stored sessions, and starts silent renewal.
     this.oidcSecurityService.checkAuth().subscribe(({ isAuthenticated, userData}) => /* ... */);
   }
 
   login() {
+    // User clicked sign-in: redirect to the identity provider.
     this.oidcSecurityService.authorize();
   }
 
@@ -118,3 +127,7 @@ export class AppComponent implements OnInit {
   }
 }
 ```
+
+> **Multiple configs:** if you registered more than one `provideAuth` configuration, use `checkAuthMultiple()` instead of `checkAuth()`. See the [Public API](documentation/public-api.md) reference for both methods.
+
+> **Single Sign-On scenario:** if you want the app to detect an existing session at the identity provider that hasn't been observed by this app yet (e.g. the user signed in to another app on the same IdP), use `checkAuthIncludingServer()`. It performs the same local bootstrap as `checkAuth()` plus an iframe silent renew against the IdP.
