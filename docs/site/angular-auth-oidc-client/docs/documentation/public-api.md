@@ -258,11 +258,15 @@ this.oidcSecurityService.getUserData('configId').subscribe((data)=> ... );
 
 ## checkAuth(url?: string, configId?: string)
 
-This method starts the complete authentication flow. Use this method if you are running with a single config or want to check a single config.
+**Call this once on every app load** (typically from your root component's `ngOnInit`). Without it, the library never bootstraps and the auth state stays uninitialised.
 
-This method parses the URL when redirected back from the Security Token Service (STS) and sets all values.
+Specifically, `checkAuth()` does three things:
 
-It returns an `Observable<LoginResponse>` containing all information you need in one object.
+1. **Processes the callback** if the current URL contains an auth response from the identity provider (after the redirect back from sign-in).
+2. **Restores an existing session** from storage if one is present, so a page refresh keeps the user signed in.
+3. **Starts silent token renewal** and the periodic token-validity check, if configured.
+
+It returns an `Observable<LoginResponse>` describing the result:
 
 ```ts
 {
@@ -275,13 +279,15 @@ It returns an `Observable<LoginResponse>` containing all information you need in
 }
 ```
 
+> `checkAuth()` does **not** redirect the user anywhere. To start a *new* sign-in (e.g. on a "Login" button click), call [`authorize()`](#authorizeconfigid-string-authoptions-authoptions) instead.
+
 ```ts
 this.oidcSecurityService.checkAuth().subscribe(({ isAuthenticated, userData, accessToken, idToken, configId }) => {
   // ...use data
 });
 ```
 
-You can also pass a `configId` to check for as well as a URL in case you want to overwrite the current one in the address bar from the browser. This is useful for mobile or desktop cases like Electron or Cordova/Ionic.
+You can also pass a `configId` to target a specific config, and a `url` to override the URL the library reads the callback from. The custom URL is mainly useful for non-browser shells like Electron or Cordova/Ionic where `window.location` doesn't reflect the callback.
 
 ```ts
 const url = '...';
@@ -292,13 +298,17 @@ this.oidcSecurityService.checkAuth(url, configId).subscribe(({ isAuthenticated, 
 });
 ```
 
+> **Multiple configs:** `checkAuth()` only bootstraps a single config. If you've registered more than one via `provideAuth`, use [`checkAuthMultiple()`](#checkauthmultipleurl-string) to bootstrap all of them in one call.
+
+> **Already signed in elsewhere?** If you want the app to detect a server-side session at the identity provider that this app hasn't observed yet (typical SSO case), use [`checkAuthIncludingServer()`](#checkauthincludingserverconfigid-string).
+
 ## checkAuthMultiple(url?: string)
 
-This method starts the complete authentication flow for multiple configs. Use this method if you are running with multiple configs to check which one is authenticated or not.
+The multi-config equivalent of [`checkAuth()`](#checkauthurl-string-configid-string). Use this once on every app load **if you've registered more than one `provideAuth` configuration** — it bootstraps all of them in a single call.
 
-This method parses the URL when you come back from the Security Token Service (STS) and sets all values.
+It does the same three things as `checkAuth()` (processes the callback, restores stored sessions, starts silent renewal), applied to every registered config.
 
-It returns an `Observable<LoginResponse[]>` containing all information you need in the `LoginResponse` object as array so that you can see which config has which values.
+It returns an `Observable<LoginResponse[]>` — one `LoginResponse` per config, in registration order — so you can see the status of each.
 
 ```ts
 [
@@ -344,7 +354,11 @@ this.oidcSecurityService.isAuthenticated('configId').subscribe((isAuthenticated)
 
 ## checkAuthIncludingServer(configId?: string)
 
-This method can be used to check the server for an authenticated session using the iframe silent renew if not locally authenticated. This is useful when opening an app in a new tab and you are already authenticated. This method ONLY works with iframe silent renew. It will not work with refresh tokens. With refresh tokens, you cannot do this, as consent is required.
+The same local bootstrap as [`checkAuth()`](#checkauthurl-string-configid-string), **plus** an iframe silent renew against the identity provider when the user isn't already locally authenticated.
+
+Use this when your app needs to detect a server-side session that this app hasn't observed yet — typically the SSO scenario where the user is already signed in to the IdP via another app and you want this app to pick that up automatically on first load.
+
+> This method **only works with iframe silent renew**. It does **not** work with refresh tokens (`useRefreshToken: true`), because completing the flow there would require user consent.
 
 Returns an `Observable<LoginResponse>`.
 
@@ -478,8 +492,11 @@ this.oidcSecurityService.getState('configId').subscribe(/*...*/);
 
 ## authorize(configId?: string, authOptions?: AuthOptions)
 
-This method must be called when you want to redirect to the authority and sign in the identity. This method takes a `configId` as parameter if you want to use a specific config and it also takes `authOptions` adding `customParams` or `redirectUrl` which can change every time you want to login.
-It also accepts an `urlHandler` which is getting called instead of the redirect.
+**Call this when the user initiates a sign-in** — typically from a "Login" button click handler, or when an auth guard determines the user needs to authenticate. It redirects the browser to the identity provider's login page.
+
+> `authorize()` does **not** check or restore session state. That's the job of [`checkAuth()`](#checkauthurl-string-configid-string), which you call once on app load.
+
+This method takes a `configId` if you want to target a specific config and an `authOptions` object with `customParams` or `redirectUrl` for per-call customization. It also accepts a `urlHandler` that is called instead of the redirect (useful if you need to construct the navigation yourself).
 
 See also: [Custom parameters](custom-parameters.md).
 
