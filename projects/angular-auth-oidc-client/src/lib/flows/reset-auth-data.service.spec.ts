@@ -36,6 +36,30 @@ describe('ResetAuthDataService', () => {
   });
 
   describe('resetAuthorizationData', () => {
+    it('does nothing if no current configuration is provided', () => {
+      // arrange
+      const resetUserDataInStoreSpy = spyOn(
+        userService,
+        'resetUserDataInStore'
+      );
+      const resetStorageFlowDataSpy = spyOn(
+        flowsDataService,
+        'resetStorageFlowData'
+      );
+      const setUnauthenticatedAndFireEventSpy = spyOn(
+        authStateService,
+        'setUnauthenticatedAndFireEvent'
+      );
+
+      // act
+      service.resetAuthorizationData(null, [{ configId: 'configId1' }]);
+
+      // assert
+      expect(resetUserDataInStoreSpy).not.toHaveBeenCalled();
+      expect(resetStorageFlowDataSpy).not.toHaveBeenCalled();
+      expect(setUnauthenticatedAndFireEventSpy).not.toHaveBeenCalled();
+    });
+
     it('calls resetUserDataInStore when autoUserInfo is true', () => {
       const resetUserDataInStoreSpy = spyOn(
         userService,

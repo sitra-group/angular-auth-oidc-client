@@ -196,6 +196,18 @@ describe('ClosestMatchingRouteService', () => {
       expect(matchingConfig).toEqual(allConfigs[0]);
     });
 
+    it('treats a config without secureRoutes as having no routes', () => {
+      const allConfigs = [{ configId: 'configId1' }];
+      const { matchingConfig, matchingRoute } =
+        service.getConfigIdForClosestMatchingRoute(
+          'https://my-secure-url.com/',
+          allConfigs
+        );
+
+      expect(matchingConfig).toBeNull();
+      expect(matchingRoute).toBeNull();
+    });
+
     it('gets best match for configured routes - no config Id', () => {
       const allConfigs = [
         {

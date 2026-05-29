@@ -91,7 +91,8 @@ describe('LoginService', () => {
       const config = null;
       const loginParSpy = spyOn(parLoginService, 'loginPar');
       const standardLoginSpy = spyOn(standardLoginService, 'loginStandard');
-      const authOptions = { customParams: { custom: 'params' } };      // act
+      const authOptions = { customParams: { custom: 'params' } };
+      // act
       const fn = (): void => service.login(config, authOptions);
 
       // assert
@@ -167,6 +168,27 @@ describe('LoginService', () => {
         );
       });
     }));
+
+    it('throws error if configuration is null', () => {
+      // arrange
+      const config = null;
+      const loginWithPopUpParSpy = spyOn(parLoginService, 'loginWithPopUpPar');
+      const loginWithPopUpStandardSpy = spyOn(
+        popUpLoginService,
+        'loginWithPopUpStandard'
+      );
+      // act
+      const fn = (): void => {
+        service.loginWithPopUp(config, []);
+      };
+
+      // assert
+      expect(fn).toThrow(
+        new Error('Please provide a configuration before setting up the module')
+      );
+      expect(loginWithPopUpParSpy).not.toHaveBeenCalled();
+      expect(loginWithPopUpStandardSpy).not.toHaveBeenCalled();
+    });
 
     it('returns error if there is already a popup open', () => {
       // arrange
