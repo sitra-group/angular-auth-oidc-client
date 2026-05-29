@@ -54,6 +54,7 @@ describe('PopUpLoginService', () => {
 
   describe('loginWithPopUpStandard', () => {
     it('does nothing if it has an invalid response type', waitForAsync(() => {
+      // arrange
       const config = { responseType: 'stubValue' };
 
       spyOn(
@@ -62,7 +63,9 @@ describe('PopUpLoginService', () => {
       ).and.returnValue(false);
       const loggerSpy = spyOn(loggerService, 'logError');
 
+      // act
       popUpLoginService.loginWithPopUpStandard(config, [config]).subscribe({
+        // assert
         error: (err) => {
           expect(loggerSpy).toHaveBeenCalled();
           expect(err.message).toBe('Invalid response type!');
@@ -71,6 +74,7 @@ describe('PopUpLoginService', () => {
     }));
 
     it('calls urlService.getAuthorizeUrl() if everything fits', waitForAsync(() => {
+      // arrange
       const config = {
         authWellknownEndpointUrl: 'authWellknownEndpoint',
         responseType: 'stubValue',
@@ -92,14 +96,17 @@ describe('PopUpLoginService', () => {
         of({} as LoginResponse)
       );
 
+      // act
       popUpLoginService
         .loginWithPopUpStandard(config, [config])
         .subscribe(() => {
+          // assert
           expect(urlService.getAuthorizeUrl).toHaveBeenCalled();
         });
     }));
 
     it('opens popup if everything fits', waitForAsync(() => {
+      // arrange
       const config = {
         authWellknownEndpointUrl: 'authWellknownEndpoint',
         responseType: 'stubValue',
@@ -122,14 +129,17 @@ describe('PopUpLoginService', () => {
       );
       const popupSpy = spyOn(popupService, 'openPopUp');
 
+      // act
       popUpLoginService
         .loginWithPopUpStandard(config, [config])
         .subscribe(() => {
+          // assert
           expect(popupSpy).toHaveBeenCalled();
         });
     }));
 
     it('returns three properties when popupservice received an url', waitForAsync(() => {
+      // arrange
       const config = {
         authWellknownEndpointUrl: 'authWellknownEndpoint',
         responseType: 'stubValue',
@@ -161,9 +171,11 @@ describe('PopUpLoginService', () => {
 
       spyOnProperty(popupService, 'result$').and.returnValue(of(popupResult));
 
+      // act
       popUpLoginService
         .loginWithPopUpStandard(config, [config])
         .subscribe((result) => {
+          // assert
           expect(checkAuthSpy).toHaveBeenCalledOnceWith(
             config,
             [config],
@@ -181,6 +193,7 @@ describe('PopUpLoginService', () => {
     }));
 
     it('returns two properties if popup was closed by user', waitForAsync(() => {
+      // arrange
       const config = {
         authWellknownEndpointUrl: 'authWellknownEndpoint',
         responseType: 'stubValue',
@@ -204,9 +217,11 @@ describe('PopUpLoginService', () => {
 
       spyOnProperty(popupService, 'result$').and.returnValue(of(popupResult));
 
+      // act
       popUpLoginService
         .loginWithPopUpStandard(config, [config])
         .subscribe((result) => {
+          // assert
           expect(checkAuthSpy).not.toHaveBeenCalled();
           expect(result).toEqual({
             isAuthenticated: false,
