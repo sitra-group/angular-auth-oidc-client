@@ -31,6 +31,12 @@ describe('BrowserStorageService', () => {
   });
 
   describe('read', () => {
+    it('returns null if configId is missing', () => {
+      const config = { configId: '' };
+
+      expect(service.read('anything', config)).toBeNull();
+    });
+
     it('returns null if there is no storage', () => {
       const config = { configId: 'configId1' };
 
@@ -63,6 +69,12 @@ describe('BrowserStorageService', () => {
   });
 
   describe('write', () => {
+    it('returns false if configId is missing', () => {
+      const config = { configId: '' };
+
+      expect(service.write('anyvalue', config)).toBeFalse();
+    });
+
     it('returns false if there is no storage', () => {
       const config = { configId: 'configId1' };
 
@@ -78,7 +90,8 @@ describe('BrowserStorageService', () => {
       const writeSpy = spyOn(
         abstractSecurityStorage,
         'write'
-      ).and.callThrough();      const result = service.write({ anyKey: 'anyvalue' }, config);
+      ).and.callThrough();
+      const result = service.write({ anyKey: 'anyvalue' }, config);
 
       expect(result).toBe(true);
       expect(writeSpy).toHaveBeenCalledOnceWith(
@@ -96,7 +109,8 @@ describe('BrowserStorageService', () => {
         abstractSecurityStorage,
         'write'
       ).and.callThrough();
-      const somethingFalsy = '';      const result = service.write(somethingFalsy, config);
+      const somethingFalsy = '';
+      const result = service.write(somethingFalsy, config);
 
       expect(result).toBe(true);
       expect(writeSpy).toHaveBeenCalledOnceWith(
@@ -123,10 +137,12 @@ describe('BrowserStorageService', () => {
 
     it('removes the entire config blob for the configId', () => {
       spyOn(service as any, 'hasStorage').and.returnValue(true);
-      const config = { configId: 'configId1' };      const removeSpy = spyOn(
+      const config = { configId: 'configId1' };
+      const removeSpy = spyOn(
         abstractSecurityStorage,
         'remove'
-      ).and.callThrough();      const result = service.remove('anyKey', config);
+      ).and.callThrough();
+      const result = service.remove('anyKey', config);
 
       expect(result).toBe(true);
       expect(removeSpy).toHaveBeenCalledOnceWith('configId1');
@@ -155,7 +171,8 @@ describe('BrowserStorageService', () => {
         abstractSecurityStorage,
         'remove'
       ).and.callThrough();
-      const config = { configId: 'configId1' };      const result = service.clear(config);
+      const config = { configId: 'configId1' };
+      const result = service.clear(config);
 
       expect(result).toBe(true);
       expect(removeSpy).toHaveBeenCalledOnceWith('configId1');
@@ -165,7 +182,8 @@ describe('BrowserStorageService', () => {
   describe('multi-config isolation', () => {
     it('clear() should only remove the specified config, not other configs', () => {
       spyOn(service as any, 'hasStorage').and.returnValue(true);
-      const config1 = { configId: 'configId1' };      const removeSpy = spyOn(abstractSecurityStorage, 'remove');
+      const config1 = { configId: 'configId1' };
+      const removeSpy = spyOn(abstractSecurityStorage, 'remove');
 
       service.clear(config1);
 
@@ -175,7 +193,8 @@ describe('BrowserStorageService', () => {
 
     it('remove() should only remove the specified config blob, not other configs', () => {
       spyOn(service as any, 'hasStorage').and.returnValue(true);
-      const config1 = { configId: 'configId1' };      const removeSpy = spyOn(abstractSecurityStorage, 'remove');
+      const config1 = { configId: 'configId1' };
+      const removeSpy = spyOn(abstractSecurityStorage, 'remove');
 
       service.remove('anyKey', config1);
 
@@ -187,7 +206,8 @@ describe('BrowserStorageService', () => {
   describe('storage scope safety', () => {
     it('clear() should not call abstractSecurityStorage.clear() which would destroy all storage', () => {
       spyOn(service as any, 'hasStorage').and.returnValue(true);
-      const config = { configId: 'configId1' };      const clearSpy = spyOn(abstractSecurityStorage, 'clear');
+      const config = { configId: 'configId1' };
+      const clearSpy = spyOn(abstractSecurityStorage, 'clear');
       const removeSpy = spyOn(abstractSecurityStorage, 'remove');
 
       service.clear(config);
@@ -200,7 +220,8 @@ describe('BrowserStorageService', () => {
 
     it('remove() should not call abstractSecurityStorage.clear() which would destroy all storage', () => {
       spyOn(service as any, 'hasStorage').and.returnValue(true);
-      const config = { configId: 'configId1' };      const clearSpy = spyOn(abstractSecurityStorage, 'clear');
+      const config = { configId: 'configId1' };
+      const clearSpy = spyOn(abstractSecurityStorage, 'clear');
       const removeSpy = spyOn(abstractSecurityStorage, 'remove');
 
       service.remove('anyKey', config);

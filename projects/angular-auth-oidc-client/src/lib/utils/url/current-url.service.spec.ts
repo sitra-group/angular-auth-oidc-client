@@ -75,3 +75,28 @@ describe('CurrentUrlService with existing Url', () => {
     });
   });
 });
+
+describe('CurrentUrlService without defaultView', () => {
+  let service: CurrentUrlService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: DOCUMENT,
+          useValue: {},
+        },
+      ],
+    });
+
+    service = TestBed.inject(CurrentUrlService);
+  });
+
+  describe('getCurrentUrl', () => {
+    it('returns null when defaultView is not available', () => {
+      const currentUrl = service.getCurrentUrl();
+
+      expect(currentUrl).toBeNull();
+    });
+  });
+});

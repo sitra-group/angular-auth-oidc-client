@@ -28,6 +28,20 @@ describe('IntervalService', () => {
     expect(intervalService).toBeTruthy();
   });
 
+  describe('isTokenValidationRunning', () => {
+    it('returns false when no validation subscription is running', () => {
+      intervalService.runTokenValidationRunning = null;
+
+      expect(intervalService.isTokenValidationRunning()).toBeFalse();
+    });
+
+    it('returns true when a validation subscription is running', () => {
+      intervalService.runTokenValidationRunning = new Subscription();
+
+      expect(intervalService.isTokenValidationRunning()).toBeTrue();
+    });
+  });
+
   describe('stopPeriodicTokenCheck', () => {
     it('calls unsubscribe and sets to null', () => {
       intervalService.runTokenValidationRunning = new Subscription();

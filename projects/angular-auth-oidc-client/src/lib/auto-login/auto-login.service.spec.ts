@@ -28,6 +28,16 @@ describe('AutoLoginService ', () => {
   });
 
   describe('checkSavedRedirectRouteAndNavigate', () => {
+    it('does nothing if config is null', () => {
+      const readSpy = spyOn(storagePersistenceService, 'read');
+      const routerSpy = spyOn(router, 'navigateByUrl');
+
+      autoLoginService.checkSavedRedirectRouteAndNavigate(null);
+
+      expect(readSpy).not.toHaveBeenCalled();
+      expect(routerSpy).not.toHaveBeenCalled();
+    });
+
     it('if not route is saved, router and delete are not called', () => {
       const deleteSpy = spyOn(storagePersistenceService, 'remove');
       const routerSpy = spyOn(router, 'navigateByUrl');
@@ -68,6 +78,14 @@ describe('AutoLoginService ', () => {
   });
 
   describe('saveRedirectRoute', () => {
+    it('does nothing if config is null', () => {
+      const writeSpy = spyOn(storagePersistenceService, 'write');
+
+      autoLoginService.saveRedirectRoute(null, 'some-route');
+
+      expect(writeSpy).not.toHaveBeenCalled();
+    });
+
     it('calls storageService with correct params', () => {
       const writeSpy = spyOn(storagePersistenceService, 'write');
 

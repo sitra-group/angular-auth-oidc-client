@@ -248,5 +248,57 @@ describe('Logger Service', () => {
       );
       expect(spy).not.toHaveBeenCalled();
     });
+
+    it('should not log if configuration is null', () => {
+      const spy = spyOn(console, 'debug');
+
+      loggerService.logDebug(null, 'some message');
+
+      expect(spy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('currentLogLevelIsEqualOrSmallerThan', () => {
+    it('returns false when no log level is configured', () => {
+      const result = (loggerService as any).currentLogLevelIsEqualOrSmallerThan(
+        null,
+        LogLevel.Debug
+      );
+
+      expect(result).toBeFalse();
+    });
+  });
+
+  describe('logLevelIsSet', () => {
+    it('returns false when log level is explicitly null', () => {
+      const result = (loggerService as any).logLevelIsSet({
+        configId: 'configId1',
+        logLevel: null,
+      });
+
+      expect(result).toBeFalse();
+    });
+
+    it('returns false when log level is undefined', () => {
+      const result = (loggerService as any).logLevelIsSet({
+        configId: 'configId1',
+      });
+
+      expect(result).toBeFalse();
+    });
+
+    it('returns false when configuration is null', () => {
+      const result = (loggerService as any).logLevelIsSet(null);
+
+      expect(result).toBeFalse();
+    });
+  });
+
+  describe('loggingIsTurnedOff', () => {
+    it('does not throw and returns false when configuration is null', () => {
+      const result = (loggerService as any).loggingIsTurnedOff(null);
+
+      expect(result).toBeFalse();
+    });
   });
 });

@@ -188,5 +188,19 @@ describe('Data Service', () => {
 
       httpMock.verify();
     }));
+
+    it('falls back to an empty string url when url is null', waitForAsync(() => {
+      dataService
+        .post(null, { some: 'thing' }, { configId: 'configId1' })
+        .subscribe();
+      const req = httpMock.expectOne('');
+
+      expect(req.request.method).toBe('POST');
+      expect(req.request.url).toBe('');
+
+      req.flush('bodyData');
+
+      httpMock.verify();
+    }));
   });
 });

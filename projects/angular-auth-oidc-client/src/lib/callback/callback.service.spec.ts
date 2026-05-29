@@ -43,6 +43,14 @@ describe('CallbackService ', () => {
       callbackService.isCallback('anyUrl');
       expect(urlServiceSpy).toHaveBeenCalledOnceWith('anyUrl', undefined);
     });
+
+    it('returns false and does not call urlService if currentUrl is empty', () => {
+      const urlServiceSpy = spyOn(urlService, 'isCallbackFromSts');
+      const result = callbackService.isCallback('');
+
+      expect(result).toBeFalse();
+      expect(urlServiceSpy).not.toHaveBeenCalled();
+    });
   });
 
   describe('stsCallback$', () => {

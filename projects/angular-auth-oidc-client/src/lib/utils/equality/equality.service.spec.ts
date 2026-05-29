@@ -149,6 +149,18 @@ describe('EqualityService Tests', () => {
 
   describe('isStringEqualOrNonOrderedArrayEqual', () => {
     const testCases = [
+      // first value null/undefined is invalid
+      {
+        input1: null as any,
+        input2: 'value1',
+        expected: false,
+      },
+      // second value null/undefined is invalid
+      {
+        input1: 'value1',
+        input2: null as any,
+        expected: false,
+      },
       {
         input1: 'value1',
         input2: 'value1',
