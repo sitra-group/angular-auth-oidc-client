@@ -733,7 +733,7 @@ export class UrlService {
   ): Observable<string | null> {
     const state =
       this.flowsDataService.getExistingOrCreateAuthStateControl(config);
-    const nonce = this.flowsDataService.createNonce(config);
+    const nonce = authOptions?.nonce ?? this.flowsDataService.createNonce(config);
 
     this.loggerService.logDebug(
       config,

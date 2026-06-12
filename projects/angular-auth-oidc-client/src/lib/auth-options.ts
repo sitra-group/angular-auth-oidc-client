@@ -3,6 +3,7 @@ export interface AuthOptions {
   urlHandler?(url: string): void;
   /** overrides redirectUrl from configuration */
   redirectUrl?: string;
+  nonce?: string;
 }
 
 export interface LogoutAuthOptions {
