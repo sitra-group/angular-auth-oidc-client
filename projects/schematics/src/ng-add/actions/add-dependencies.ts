@@ -1,4 +1,4 @@
-@sitra-group/import { Rule, SchematicContext, Tree } from '@angular-devkit/schematics';
+import { Rule, SchematicContext, Tree } from '@angular-devkit/schematics';
 import { NodeDependency, NodeDependencyType, addPackageJsonDependency } from '@schematics/angular/utility/dependencies';
 import { NgAddOptions } from '../models/ng-add-options';
 
