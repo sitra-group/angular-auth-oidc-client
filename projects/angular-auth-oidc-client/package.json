@@ -1,5 +1,5 @@
 {
-  "name": "@SitraGroup/angular-auth-oidc-client",
+  "name": "@sitra-group/angular-auth-oidc-client",
   "author": "Damien Bowden & Fabian Gosebrink & Wout Dorny",
   "peerDependencies": {
     "rxjs": "^6.5.3 || ^7.4.0",
