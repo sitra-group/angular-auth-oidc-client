@@ -13,7 +13,7 @@ export function addStandaloneConfigsToProviders(options: NgAddOptions): Rule {
     return chain([
       addRootProvider(projectName, ({code, external}) => {
         external('authConfig', `./auth/${fileName}`);
-        return code`${external('provideAuth', 'angular-auth-oidc-client')}(authConfig)`;
+        return code`${external('provideAuth', '@sitra-group/angular-auth-oidc-client')}(authConfig)`;
       }),
     ] as Iterable<Rule>);
   };

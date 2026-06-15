@@ -1,4 +1,4 @@
-name: Build, Lint & Test Lib
+name: Build, Lint, Test and publish Lib
 
 on:
   push:
@@ -179,3 +179,31 @@ jobs:
       - name: Build Angular Application
         working-directory: ./angular-auth-oidc-client-test
         run: npm run build
+        
+  publish_package:
+    needs: build_job
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Download Artefact
+        uses: actions/download-artifact@v4
+        with:
+          name: angular_auth_oidc_client_artefact
+          path: package
+
+      - name: Setup Node.js for GitHub Packages
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          registry-url: https://npm.pkg.github.com/
+
+      - name: Publish to GitHub Packages
+        run: |
+          cd package
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

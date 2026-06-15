@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { PassedInitialConfig, StsConfigHttpLoader, StsConfigLoader } from 'angular-auth-oidc-client';
+import { PassedInitialConfig, StsConfigHttpLoader, StsConfigLoader } from '@sitra-group/angular-auth-oidc-client';
 import { map } from 'rxjs/operators';
 
 export const httpLoaderFactory = (httpClient: HttpClient) => {

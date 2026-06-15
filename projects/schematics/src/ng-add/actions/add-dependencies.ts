@@ -4,7 +4,7 @@ import { NgAddOptions } from '../models/ng-add-options';
 
 const dependenciesToAdd: any[] = [
   {
-    name: 'angular-auth-oidc-client',
+    name: '@sitra-group/angular-auth-oidc-client',
     version: '21.0.3',
   },
 ];
