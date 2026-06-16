@@ -283,6 +283,7 @@ describe('CheckAuthService', () => {
       );
       spyOn(authStateService, 'getAccessToken').and.returnValue('at');
       spyOn(authStateService, 'getIdToken').and.returnValue('idt');
+      spyOn(authStateService, 'getNonce').and.returnValue('nonce');
 
       checkAuthService
         .checkAuth(allConfigs[0], allConfigs)
@@ -293,6 +294,7 @@ describe('CheckAuthService', () => {
             accessToken: 'at',
             configId: 'configId1',
             idToken: 'idt',
+            nonce: 'nonce',
           });
           expect(spy).not.toHaveBeenCalled();
         });
