@@ -106,6 +106,20 @@ export class AuthStateService {
     return this.decodeURIComponentSafely(token);
   }
 
+  getNonce(configuration: OpenIdConfiguration | null): string {
+    if (!configuration) {
+      return '';
+    }
+
+    if (!this.isAuthenticated(configuration)) {
+      return '';
+    }
+
+    const nonce = this.storagePersistenceService.getNonce(configuration);
+
+    return this.decodeURIComponentSafely(nonce);
+  }
+
   getRefreshToken(configuration: OpenIdConfiguration | null): string {
     if (!configuration) {
       return '';

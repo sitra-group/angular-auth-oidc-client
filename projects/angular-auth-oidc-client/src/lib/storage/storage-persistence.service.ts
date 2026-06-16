@@ -81,6 +81,10 @@ export class StoragePersistenceService {
     return this.read('authnResult', config)?.id_token;
   }
 
+  getNonce(config: OpenIdConfiguration): string {
+    return this.read('authNonce', config);
+  }
+
   getRefreshToken(config: OpenIdConfiguration): string {
     const refreshToken = this.read('authnResult', config)?.refresh_token;
 

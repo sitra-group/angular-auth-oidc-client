@@ -253,6 +253,7 @@ export class CheckAuthService {
           userData: this.userService.getUserDataFromStore(config),
           accessToken: this.authStateService.getAccessToken(config),
           idToken: this.authStateService.getIdToken(config),
+          nonce: this.authStateService.getNonce(config),
           configId,
         };
 
