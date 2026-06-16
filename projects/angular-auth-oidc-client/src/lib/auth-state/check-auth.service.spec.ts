@@ -241,6 +241,7 @@ describe('CheckAuthService', () => {
       );
       spyOn(authStateService, 'getAccessToken').and.returnValue('at');
       spyOn(authStateService, 'getIdToken').and.returnValue('idt');
+      spyOn(authStateService, 'getNonce').and.returnValue('nonce');
 
       const spy = spyOn(
         callBackService,
@@ -256,6 +257,7 @@ describe('CheckAuthService', () => {
             accessToken: 'at',
             configId: 'configId1',
             idToken: 'idt',
+            nonce: 'nonce',
           });
           expect(spy).toHaveBeenCalled();
         });
@@ -316,6 +318,7 @@ describe('CheckAuthService', () => {
       });
       spyOn(authStateService, 'getAccessToken').and.returnValue('at');
       spyOn(authStateService, 'getIdToken').and.returnValue('idt');
+      spyOn(authStateService, 'getNonce').and.returnValue('nonce');
 
       const setAuthorizedAndFireEventSpy = spyOn(
         authStateService,
@@ -334,6 +337,7 @@ describe('CheckAuthService', () => {
             accessToken: 'at',
             configId: 'configId1',
             idToken: 'idt',
+            nonce: 'nonce',
           });
           expect(setAuthorizedAndFireEventSpy).toHaveBeenCalled();
           expect(userServiceSpy).toHaveBeenCalled();
@@ -351,6 +355,7 @@ describe('CheckAuthService', () => {
       );
       spyOn(authStateService, 'getAccessToken').and.returnValue('at');
       spyOn(authStateService, 'getIdToken').and.returnValue('it');
+      spyOn(authStateService, 'getNonce').and.returnValue('nonce');
       spyOn(callBackService, 'handleCallbackAndFireEvents').and.returnValue(
         of({} as CallbackContext)
       );
@@ -373,6 +378,7 @@ describe('CheckAuthService', () => {
             accessToken: 'at',
             configId: 'configId1',
             idToken: 'it',
+            nonce: 'nonce',
           });
           expect(setAuthorizedAndFireEventSpy).not.toHaveBeenCalled();
           expect(userServiceSpy).not.toHaveBeenCalled();
@@ -389,6 +395,7 @@ describe('CheckAuthService', () => {
       );
       spyOn(authStateService, 'getAccessToken').and.returnValue('at');
       spyOn(authStateService, 'getIdToken').and.returnValue('idt');
+      spyOn(authStateService, 'getNonce').and.returnValue('nonce');
       spyOn(callBackService, 'handleCallbackAndFireEvents').and.returnValue(
         of({} as CallbackContext)
       );
@@ -405,6 +412,7 @@ describe('CheckAuthService', () => {
             accessToken: 'at',
             configId: 'configId1',
             idToken: 'idt',
+            nonce: 'nonce',
           });
         });
     }));
@@ -833,7 +841,8 @@ describe('CheckAuthService', () => {
       const allConfigs = [
         { configId: 'configId1', authority: 'some-authority1' },
         { configId: 'configId2', authority: 'some-authority2' },
-      ];      const spy = spyOn(
+      ];
+      const spy = spyOn(
         checkAuthService as any,
         'checkAuthWithConfig'
       ).and.callThrough();
@@ -863,7 +872,8 @@ describe('CheckAuthService', () => {
       const allConfigs = [
         { configId: 'configId1', authority: 'some-authority1' },
         { configId: 'configId2', authority: 'some-authority2' },
-      ];      const spy = spyOn(
+      ];
+      const spy = spyOn(
         checkAuthService as any,
         'checkAuthWithConfig'
       ).and.callThrough();
