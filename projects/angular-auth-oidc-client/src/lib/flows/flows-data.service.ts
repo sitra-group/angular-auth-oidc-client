@@ -1,10 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import { from, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { OpenIdConfiguration } from '../config/openid-configuration';
 import { LoggerService } from '../logging/logger.service';
 import { StoragePersistenceService } from '../storage/storage-persistence.service';
-import { CryptoService } from '../utils/crypto/crypto.service';
 import { SilentRenewRunning } from './flows.models';
 import { RandomService } from './random/random.service';
 
@@ -15,7 +12,6 @@ export class FlowsDataService {
     StoragePersistenceService
   );
   private readonly randomService = inject(RandomService);
-  private readonly cryptoService = inject(CryptoService);
 
   createNonce(configuration: OpenIdConfiguration): string {
     const nonce = this.randomService.createRandom(40, configuration);
@@ -28,24 +24,6 @@ export class FlowsDataService {
 
   setNonce(nonce: string, configuration: OpenIdConfiguration): void {
     this.storagePersistenceService.write('authNonce', nonce, configuration);
-  }
-
-  calcHash(
-    valueToHash: string,
-    algorithm = 'SHA-256'
-  ): Observable<string> {
-    const msgBuffer: Uint8Array = new TextEncoder().encode(valueToHash);
-
-    return from(
-      this.cryptoService.getCrypto().subtle.digest(algorithm, msgBuffer)
-    ).pipe(
-      map((hashBuffer: unknown) => {
-        const buffer = hashBuffer as ArrayBuffer;
-        const hashArray: number[] = Array.from(new Uint8Array(buffer));
-
-        return this.toHashString(hashArray);
-      })
-    );
   }
 
   getAuthStateControl(configuration: OpenIdConfiguration | null): string {
@@ -220,15 +198,5 @@ export class FlowsDataService {
     }
 
     return JSON.parse(storageEntry);
-  }
-  
-  private toHashString(byteArray: number[]): string {
-    let result = '';
-
-    for (const e of byteArray) {
-      result += String.fromCharCode(e);
-    }
-
-    return result;
   }
 }
