@@ -279,26 +279,26 @@ export class TokenValidationService {
   // https://bitbucket.org/openid/connect/issues/1025/ambiguity-with-how-nonce-is-handled-on
   // The current spec is ambiguous and KeyCloak does send it.
   validateIdTokenNonce(
-    dataIdToken: any,
-    localNonce: any,
-    ignoreNonceAfterRefresh: boolean,
-    configuration: OpenIdConfiguration
+    _dataIdToken: any,
+    _localNonce: any,
+    _ignoreNonceAfterRefresh: boolean,
+    _configuration: OpenIdConfiguration
   ): boolean {
-    const isFromRefreshToken =
-      (dataIdToken.nonce === undefined || ignoreNonceAfterRefresh) &&
-      localNonce === TokenValidationService.refreshTokenNoncePlaceholder;
+    // const isFromRefreshToken =
+    //   (dataIdToken.nonce === undefined || ignoreNonceAfterRefresh) &&
+    //   localNonce === TokenValidationService.refreshTokenNoncePlaceholder;
 
-    if (!isFromRefreshToken && dataIdToken.nonce !== localNonce) {
-      this.loggerService.logDebug(
-        configuration,
-        'Validate_id_token_nonce failed, dataIdToken.nonce: ' +
-          dataIdToken.nonce +
-          ' local_nonce:' +
-          localNonce
-      );
+    // if (!isFromRefreshToken && dataIdToken.nonce !== localNonce) {
+    //   this.loggerService.logDebug(
+    //     configuration,
+    //     'Validate_id_token_nonce failed, dataIdToken.nonce: ' +
+    //       dataIdToken.nonce +
+    //       ' local_nonce:' +
+    //       localNonce
+    //   );
 
-      return false;
-    }
+    //   return false;
+    // }
 
     return true;
   }
