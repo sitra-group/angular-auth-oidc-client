@@ -1,11 +1,12 @@
 
-import { inject, Injectable, RendererFactory2, DOCUMENT } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { inject, Injectable, RendererFactory2 } from '@angular/core';
 import { Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { OpenIdConfiguration } from '../config/openid-configuration';
 import { LoggerService } from '../logging/logger.service';
 import { UrlService } from '../utils/url/url.service';
-import { SilentRenewService, getFrameId } from './silent-renew.service';
+import { getFrameId, SilentRenewService } from './silent-renew.service';
 
 @Injectable({ providedIn: 'root' })
 export class RefreshSessionIframeService {

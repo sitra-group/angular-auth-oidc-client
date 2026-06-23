@@ -1,5 +1,6 @@
 
-import { inject, Injectable, NgZone, OnDestroy, DOCUMENT } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { inject, Injectable, NgZone, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { OpenIdConfiguration } from '../config/openid-configuration';

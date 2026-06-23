@@ -1,5 +1,6 @@
 
-import { inject, Injectable, DOCUMENT } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { inject, Injectable } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, switchMap, tap } from 'rxjs/operators';
 import { AuthStateService } from '../../auth-state/auth-state.service';
