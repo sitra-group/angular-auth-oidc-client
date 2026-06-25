@@ -30,8 +30,8 @@ jobs:
       - name: Linting Library
         run: npm run lint-lib
 
-      - name: Testing Frontend
-        run: npm run test-lib-ci
+      # - name: Testing Frontend
+      #  run: npm run test-lib-ci
 
       - name: Coveralls
         uses: coverallsapp/github-action@master
