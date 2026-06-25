@@ -1,4 +1,6 @@
 import { inject, Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { OpenIdConfiguration } from '../config/openid-configuration';
 import { LoggerService } from '../logging/logger.service';
 import { StoragePersistenceService } from '../storage/storage-persistence.service';
@@ -13,16 +15,21 @@ export class FlowsDataService {
   );
   private readonly randomService = inject(RandomService);
 
-  createNonce(configuration: OpenIdConfiguration): string {
-    const nonce = this.randomService.createRandom(40, configuration);
+  createNonce(configuration: OpenIdConfiguration): Observable<string> {
+    const rawNonce = this.randomService.createRandom(40, configuration);
+    
+    return this.randomService.encrypt(rawNonce).pipe(
+      map(nonce => {
+        this.loggerService.logDebug(configuration, 'Nonce created. nonce:' + nonce);
+        this.setNonce(rawNonce, nonce, configuration);
 
-    this.loggerService.logDebug(configuration, 'Nonce created. nonce:' + nonce);
-    this.setNonce(nonce, configuration);
-
-    return nonce;
+        return nonce;
+      }),
+    );
   }
 
-  setNonce(nonce: string, configuration: OpenIdConfiguration): void {
+  setNonce(rawNonce: string, nonce: string, configuration: OpenIdConfiguration): void {
+    this.storagePersistenceService.write('rawNonce', rawNonce, configuration);
     this.storagePersistenceService.write('authNonce', nonce, configuration);
   }
 

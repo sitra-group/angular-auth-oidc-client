@@ -15,8 +15,8 @@ export class JwkWindowCryptoService {
       | AesKeyAlgorithm
       | null
   ): Promise<CryptoKey> {
-    return this.cryptoService
-      .getCrypto()
+    return (this.cryptoService
+      .getCrypto() as any)
       .subtle.importKey('jwk', key, algorithm, false, ['verify']);
   }
 
@@ -26,8 +26,8 @@ export class JwkWindowCryptoService {
     signature: Uint8Array,
     signingInput: string
   ): Promise<boolean> {
-    return this.cryptoService
-      .getCrypto()
+    return (this.cryptoService
+      .getCrypto() as any)
       .subtle.verify(
         verifyAlgorithm,
         cryptoKey,

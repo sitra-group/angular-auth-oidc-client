@@ -1,4 +1,5 @@
 import { inject, Injectable } from '@angular/core';
+import { from, Observable } from 'rxjs';
 import { OpenIdConfiguration } from '../../config/openid-configuration';
 import { LoggerService } from '../../logging/logger.service';
 import { CryptoService } from '../../utils/crypto/crypto.service';
@@ -7,6 +8,10 @@ import { CryptoService } from '../../utils/crypto/crypto.service';
 export class RandomService {
   private readonly loggerService = inject(LoggerService);
   private readonly cryptoService = inject(CryptoService);
+
+  encrypt(value: string): Observable<string> {
+    return from(this.sha256Encrypt(value));
+  }
 
   createRandom(
     requiredLength: number,
@@ -33,6 +38,15 @@ export class RandomService {
     }
 
     return Array.from(arr, this.toHex).join('') + this.randomString(7);
+  }
+
+  private async sha256Encrypt(value: string): Promise<string> {
+    const crypto = this.cryptoService.getCrypto();
+    const buffer = new TextEncoder().encode(value);
+    const hashedBuffer = await crypto.subtle.digest('SHA-256', buffer);
+    const array = Array.from(new Uint8Array(hashedBuffer));
+    
+    return array.map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
   private toHex(dec: number): string {

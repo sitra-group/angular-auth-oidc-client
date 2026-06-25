@@ -3,7 +3,7 @@ export interface LoginResponse {
   userData: any;
   accessToken: string;
   idToken: string;
-  nonce?: string,
+  nonce?: { value: string, raw: string },
   configId?: string;
   errorMessage?: string;
 }

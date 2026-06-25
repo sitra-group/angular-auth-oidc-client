@@ -72,7 +72,7 @@ export class HistoryJwtKeysCallbackHandlerService {
 
       this.loggerService.logDebug(config, errorMessage);
       this.resetAuthDataService.resetAuthorizationData(config, allConfigs);
-      this.flowsDataService.setNonce('', config);
+      this.flowsDataService.setNonce('', '', config);
       this.handleResultErrorFromCallback(
         callbackContext.authResult,
         callbackContext.isRenewProcess,

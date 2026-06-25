@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 import { AuthOptions } from '../../auth-options';
 import { OpenIdConfiguration } from '../../config/openid-configuration';
 import { FlowsDataService } from '../../flows/flows-data.service';
@@ -123,7 +123,7 @@ export class UrlService {
       return this.createUrlCodeFlowWithSilentRenew(config, customParams);
     }
 
-    return of(this.createUrlImplicitFlowWithSilentRenew(config, customParams));
+    return this.createUrlImplicitFlowWithSilentRenew(config, customParams);
   }
 
   getAuthorizeParUrl(
@@ -190,7 +190,9 @@ export class UrlService {
       return this.createUrlCodeFlowAuthorize(config, authOptions);
     }
 
-    return of(this.createUrlImplicitFlowAuthorize(config, authOptions) || '');
+    return this.createUrlImplicitFlowAuthorize(config, authOptions).pipe(
+      map(result => result || ''),
+    );
   }
 
   getEndSessionEndpoint(configuration: OpenIdConfiguration): {
@@ -385,7 +387,6 @@ export class UrlService {
 
     const state =
       this.flowsDataService.getExistingOrCreateAuthStateControl(configuration);
-    const nonce = this.flowsDataService.createNonce(configuration);
 
     this.loggerService.logDebug(
       configuration,
@@ -393,48 +394,52 @@ export class UrlService {
     );
 
     return this.getCodeChallenge(configuration).pipe(
-      map((codeChallenge: string) => {
-        const {
-          clientId,
-          responseType,
-          scope,
-          hdParam,
-          customParamsAuthRequest,
-        } = configuration;
-        let params = this.createHttpParams('');
+      switchMap(codeChallenge => {
+        return this.flowsDataService.createNonce(configuration).pipe(
+          map(nonce => {
+            const {
+              clientId,
+              responseType,
+              scope,
+              hdParam,
+              customParamsAuthRequest,
+            } = configuration;
+            let params = this.createHttpParams('');
 
-        params = params.set('client_id', clientId ?? '');
-        params = params.append('redirect_uri', redirectUrl);
-        params = params.append('response_type', responseType ?? '');
-        params = params.append('scope', scope ?? '');
-        params = params.append('nonce', nonce);
-        params = params.append('state', state);
+            params = params.set('client_id', clientId ?? '');
+            params = params.append('redirect_uri', redirectUrl);
+            params = params.append('response_type', responseType ?? '');
+            params = params.append('scope', scope ?? '');
+            params = params.append('nonce', nonce);
+            params = params.append('state', state);
 
-        if (!configuration.disablePkce) {
-          params = params.append('code_challenge', codeChallenge);
-          params = params.append('code_challenge_method', 'S256');
-        }
+            if (!configuration.disablePkce) {
+              params = params.append('code_challenge', codeChallenge);
+              params = params.append('code_challenge_method', 'S256');
+            }
 
-        if (hdParam) {
-          params = params.append('hd', hdParam);
-        }
+            if (hdParam) {
+              params = params.append('hd', hdParam);
+            }
 
-        if (customParamsAuthRequest) {
-          params = this.appendCustomParams(
-            { ...customParamsAuthRequest },
-            params
-          );
-        }
+            if (customParamsAuthRequest) {
+              params = this.appendCustomParams(
+                { ...customParamsAuthRequest },
+                params
+              );
+            }
 
-        if (authOptions?.customParams) {
-          params = this.appendCustomParams(
-            { ...authOptions.customParams },
-            params
-          );
-        }
+            if (authOptions?.customParams) {
+              params = this.appendCustomParams(
+                { ...authOptions.customParams },
+                params
+              );
+            }
 
-        return params.toString();
-      })
+            return params.toString();
+          }),
+        );
+      }),
     );
   }
 
@@ -588,14 +593,13 @@ export class UrlService {
   private createUrlImplicitFlowWithSilentRenew(
     configuration: OpenIdConfiguration,
     customParams?: { [key: string]: string | number | boolean }
-  ): string | null {
+  ): Observable<string | null> {
     const state =
       this.flowsDataService.getExistingOrCreateAuthStateControl(configuration);
-    const nonce = this.flowsDataService.createNonce(configuration);
     const silentRenewUrl = this.getSilentRenewUrl(configuration);
 
     if (!silentRenewUrl) {
-      return null;
+      return of(null);
     }
 
     this.loggerService.logDebug(
@@ -604,29 +608,33 @@ export class UrlService {
       state
     );
 
-    const authWellKnownEndPoints = this.storagePersistenceService.read(
-      'authWellKnownEndPoints',
-      configuration
+    return this.flowsDataService.createNonce(configuration).pipe(
+      map(nonce => {
+        const authWellKnownEndPoints = this.storagePersistenceService.read(
+          'authWellKnownEndPoints',
+          configuration
+        );
+
+        if (authWellKnownEndPoints) {
+          return this.createAuthorizeUrl(
+            '',
+            silentRenewUrl,
+            nonce,
+            state,
+            configuration,
+            'none',
+            customParams
+          );
+        }
+
+        this.loggerService.logError(
+          configuration,
+          'authWellKnownEndpoints is undefined'
+        );
+
+        return null;
+      }),
     );
-
-    if (authWellKnownEndPoints) {
-      return this.createAuthorizeUrl(
-        '',
-        silentRenewUrl,
-        nonce,
-        state,
-        configuration,
-        'none',
-        customParams
-      );
-    }
-
-    this.loggerService.logError(
-      configuration,
-      'authWellKnownEndpoints is undefined'
-    );
-
-    return null;
   }
 
   private createUrlCodeFlowWithSilentRenew(
@@ -635,7 +643,6 @@ export class UrlService {
   ): Observable<string> {
     const state =
       this.flowsDataService.getExistingOrCreateAuthStateControl(configuration);
-    const nonce = this.flowsDataService.createNonce(configuration);
 
     this.loggerService.logDebug(
       configuration,
@@ -647,47 +654,50 @@ export class UrlService {
       this.flowsDataService.createCodeVerifier(configuration);
 
     return this.jwtWindowCryptoService.generateCodeChallenge(codeVerifier).pipe(
-      map((codeChallenge: string) => {
-        const silentRenewUrl = this.getSilentRenewUrl(configuration);
+      switchMap(codeChallenge => {
+        return this.flowsDataService.createNonce(configuration).pipe(
+          map(nonce => {
+            const silentRenewUrl = this.getSilentRenewUrl(configuration);
 
-        if (!silentRenewUrl) {
-          return '';
-        }
+            if (!silentRenewUrl) {
+              return '';
+            }
 
-        const authWellKnownEndPoints = this.storagePersistenceService.read(
-          'authWellKnownEndPoints',
-          configuration
+            const authWellKnownEndPoints = this.storagePersistenceService.read(
+              'authWellKnownEndPoints',
+              configuration
+            );
+
+            if (authWellKnownEndPoints) {
+              return this.createAuthorizeUrl(
+                codeChallenge,
+                silentRenewUrl,
+                nonce,
+                state,
+                configuration,
+                'none',
+                customParams
+              );
+            }
+
+            this.loggerService.logWarning(
+              configuration,
+              'authWellKnownEndpoints is undefined'
+            );
+
+            return '';
+          }),
         );
-
-        if (authWellKnownEndPoints) {
-          return this.createAuthorizeUrl(
-            codeChallenge,
-            silentRenewUrl,
-            nonce,
-            state,
-            configuration,
-            'none',
-            customParams
-          );
-        }
-
-        this.loggerService.logWarning(
-          configuration,
-          'authWellKnownEndpoints is undefined'
-        );
-
-        return '';
-      })
+      }),
     );
   }
 
   private createUrlImplicitFlowAuthorize(
     configuration: OpenIdConfiguration,
     authOptions?: AuthOptions
-  ): string | null {
+  ): Observable<string | null> {
     const state =
       this.flowsDataService.getExistingOrCreateAuthStateControl(configuration);
-    const nonce = this.flowsDataService.createNonce(configuration);
 
     this.loggerService.logDebug(
       configuration,
@@ -697,34 +707,38 @@ export class UrlService {
     const redirectUrl = this.getRedirectUrl(configuration, authOptions);
 
     if (!redirectUrl) {
-      return null;
+      return of(null);
     }
 
-    const authWellKnownEndPoints = this.storagePersistenceService.read(
-      'authWellKnownEndPoints',
-      configuration
+    return this.flowsDataService.createNonce(configuration).pipe(
+      map(nonce => {
+        const authWellKnownEndPoints = this.storagePersistenceService.read(
+          'authWellKnownEndPoints',
+          configuration
+        );
+
+        if (authWellKnownEndPoints) {
+          const { customParams } = authOptions || {};
+
+          return this.createAuthorizeUrl(
+            '',
+            redirectUrl,
+            nonce,
+            state,
+            configuration,
+            '',
+            customParams
+          );
+        }
+
+        this.loggerService.logError(
+          configuration,
+          'authWellKnownEndpoints is undefined'
+        );
+
+        return null;
+      }),
     );
-
-    if (authWellKnownEndPoints) {
-      const { customParams } = authOptions || {};
-
-      return this.createAuthorizeUrl(
-        '',
-        redirectUrl,
-        nonce,
-        state,
-        configuration,
-        '',
-        customParams
-      );
-    }
-
-    this.loggerService.logError(
-      configuration,
-      'authWellKnownEndpoints is undefined'
-    );
-
-    return null;
   }
 
   private createUrlCodeFlowAuthorize(
@@ -733,12 +747,6 @@ export class UrlService {
   ): Observable<string | null> {
     const state =
       this.flowsDataService.getExistingOrCreateAuthStateControl(config);
-    const nonce =
-      authOptions?.nonce ?? this.flowsDataService.createNonce(config);
-
-    if (authOptions?.nonce) {
-      this.flowsDataService.setNonce(nonce, config);
-    }
 
     this.loggerService.logDebug(
       config,
@@ -746,39 +754,43 @@ export class UrlService {
     );
 
     const redirectUrl = this.getRedirectUrl(config, authOptions);
-
+    
     if (!redirectUrl) {
       return of(null);
     }
 
     return this.getCodeChallenge(config).pipe(
-      map((codeChallenge: string) => {
-        const authWellKnownEndPoints = this.storagePersistenceService.read(
-          'authWellKnownEndPoints',
-          config
+      switchMap(codeChallenge => {
+        return this.flowsDataService.createNonce(config).pipe(
+          map(nonce => {
+            const authWellKnownEndPoints = this.storagePersistenceService.read(
+              'authWellKnownEndPoints',
+              config
+            );
+
+            if (authWellKnownEndPoints) {
+              const { customParams } = authOptions || {};
+
+              return this.createAuthorizeUrl(
+                codeChallenge,
+                redirectUrl,
+                nonce,
+                state,
+                config,
+                '',
+                customParams
+              );
+            }
+
+            this.loggerService.logError(
+              config,
+              'authWellKnownEndpoints is undefined'
+            );
+
+            return '';
+          }),
         );
-
-        if (authWellKnownEndPoints) {
-          const { customParams } = authOptions || {};
-
-          return this.createAuthorizeUrl(
-            codeChallenge,
-            redirectUrl,
-            nonce,
-            state,
-            config,
-            '',
-            customParams
-          );
-        }
-
-        this.loggerService.logError(
-          config,
-          'authWellKnownEndpoints is undefined'
-        );
-
-        return '';
-      })
+      }),
     );
   }
 

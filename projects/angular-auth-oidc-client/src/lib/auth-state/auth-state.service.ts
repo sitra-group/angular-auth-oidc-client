@@ -106,18 +106,22 @@ export class AuthStateService {
     return this.decodeURIComponentSafely(token);
   }
 
-  getNonce(configuration: OpenIdConfiguration | null): string {
+  getNonce(configuration: OpenIdConfiguration | null): { value: string, raw: string } {
     if (!configuration) {
-      return '';
+      return { value: '', raw: '' };
     }
 
     if (!this.isAuthenticated(configuration)) {
-      return '';
+      return { value: '', raw: '' };
     }
 
     const nonce = this.storagePersistenceService.getNonce(configuration);
+    const rawNonce = this.storagePersistenceService.getRawNonce(configuration);
 
-    return this.decodeURIComponentSafely(nonce);
+    return {
+      value: this.decodeURIComponentSafely(nonce),
+      raw: this.decodeURIComponentSafely(rawNonce),
+    };
   }
 
   getRefreshToken(configuration: OpenIdConfiguration | null): string {

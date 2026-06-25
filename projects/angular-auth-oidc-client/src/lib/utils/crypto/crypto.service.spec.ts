@@ -11,7 +11,7 @@ describe('CryptoService', () => {
         CryptoService,
         {
           provide: DOCUMENT,
-          useValue: { defaultView: { crypto: 'some-thing' } },
+          useValue: { defaultView: { crypto: 'some-thing' as unknown as Crypto } },
         },
       ],
     });
@@ -32,7 +32,7 @@ describe('CryptoService', () => {
     const crypto = cryptoService.getCrypto();
 
     // assert
-    expect(crypto).toBe('some-thing');
+    expect(crypto).toBe('some-thing' as unknown as Crypto);
   });
 });
 
@@ -45,7 +45,7 @@ describe('CryptoService: msCrypto', () => {
         CryptoService,
         {
           provide: DOCUMENT,
-          useValue: { defaultView: { msCrypto: 'some-msCrypto-thing' } },
+          useValue: { defaultView: { msCrypto: 'some-msCrypto-thing' as unknown as Crypto } },
         },
       ],
     });
@@ -66,6 +66,6 @@ describe('CryptoService: msCrypto', () => {
     const crypto = cryptoService.getCrypto();
 
     // assert
-    expect(crypto).toBe('some-msCrypto-thing');
+    expect(crypto).toBe('some-msCrypto-thing' as unknown as Crypto);
   });
 });

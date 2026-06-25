@@ -31,7 +31,7 @@ export class JwtWindowCryptoService {
     valueToHash: string,
     algorithm = 'SHA-256'
   ): Observable<string> {
-    const msgBuffer: Uint8Array = new TextEncoder().encode(valueToHash);
+    const msgBuffer = new TextEncoder().encode(valueToHash);
 
     return from(
       this.cryptoService.getCrypto().subtle.digest(algorithm, msgBuffer)

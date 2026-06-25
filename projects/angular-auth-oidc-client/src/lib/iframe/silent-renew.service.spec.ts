@@ -193,7 +193,7 @@ describe('SilentRenewService  ', () => {
               config,
               allConfigs
             );
-            expect(setNonceSpy).toHaveBeenCalledOnceWith('', config);
+            expect(setNonceSpy).toHaveBeenCalledOnceWith('', '', config);
             expect(stopPeriodicTokenCheckSpy).toHaveBeenCalledTimes(1);
           },
         });

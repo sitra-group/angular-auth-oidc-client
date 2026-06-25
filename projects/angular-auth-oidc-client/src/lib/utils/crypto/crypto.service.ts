@@ -6,7 +6,7 @@ import { Injectable, inject } from '@angular/core';
 export class CryptoService {
   private readonly document = inject<Document>(DOCUMENT);
 
-  getCrypto(): any {
+  getCrypto(): Crypto {
     // support for IE,  (window.crypto || window.msCrypto)
     return (
       this.document.defaultView?.crypto ||

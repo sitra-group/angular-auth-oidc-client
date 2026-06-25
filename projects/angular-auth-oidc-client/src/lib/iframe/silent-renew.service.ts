@@ -84,7 +84,7 @@ export class SilentRenewService {
         configId: config.configId,
       });
       this.resetAuthDataService.resetAuthorizationData(config, allConfigs);
-      this.flowsDataService.setNonce('', config);
+      this.flowsDataService.setNonce('', '', config);
       this.intervalService.stopPeriodicTokenCheck();
 
       return throwError(() => new Error(errorParam));

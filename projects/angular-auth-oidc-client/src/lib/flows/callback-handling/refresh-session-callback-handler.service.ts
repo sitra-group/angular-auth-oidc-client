@@ -46,6 +46,7 @@ export class RefreshSessionCallbackHandlerService {
       );
       // Nonce is not used with refresh tokens; but Key cloak may send it anyway
       this.flowsDataService.setNonce(
+        '',
         TokenValidationService.refreshTokenNoncePlaceholder,
         config
       );

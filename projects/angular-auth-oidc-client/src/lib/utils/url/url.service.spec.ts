@@ -1302,7 +1302,7 @@ describe('UrlService Tests', () => {
         flowsDataService,
         'getExistingOrCreateAuthStateControl'
       ).and.returnValue('testState');
-      spyOn(flowsDataService, 'createNonce').and.returnValue('testNonce');
+      spyOn(flowsDataService, 'createNonce').and.returnValue(of('testNonce'));
       spyOn(flowsDataService, 'createCodeVerifier').and.returnValue(
         'testCodeVerifier'
       );
@@ -1333,7 +1333,7 @@ describe('UrlService Tests', () => {
         flowsDataService,
         'getExistingOrCreateAuthStateControl'
       ).and.returnValue('testState');
-      spyOn(flowsDataService, 'createNonce').and.returnValue('testNonce');
+      spyOn(flowsDataService, 'createNonce').and.returnValue(of('testNonce'));
       spyOn(flowsDataService, 'createCodeVerifier').and.returnValue(
         'testCodeVerifier'
       );
@@ -1364,7 +1364,7 @@ describe('UrlService Tests', () => {
         flowsDataService,
         'getExistingOrCreateAuthStateControl'
       ).and.returnValue('testState');
-      spyOn(flowsDataService, 'createNonce').and.returnValue('testNonce');
+      spyOn(flowsDataService, 'createNonce').and.returnValue(of('testNonce'));
       spyOn(flowsDataService, 'createCodeVerifier').and.returnValue(
         'testCodeVerifier'
       );
@@ -1395,7 +1395,7 @@ describe('UrlService Tests', () => {
         flowsDataService,
         'getExistingOrCreateAuthStateControl'
       ).and.returnValue('testState');
-      spyOn(flowsDataService, 'createNonce').and.returnValue('testNonce');
+      spyOn(flowsDataService, 'createNonce').and.returnValue(of('testNonce'));
       spyOn(flowsDataService, 'createCodeVerifier').and.returnValue(
         'testCodeVerifier'
       );
@@ -1431,7 +1431,7 @@ describe('UrlService Tests', () => {
         flowsDataService,
         'getExistingOrCreateAuthStateControl'
       ).and.returnValue('testState');
-      spyOn(flowsDataService, 'createNonce').and.returnValue('testNonce');
+      spyOn(flowsDataService, 'createNonce').and.returnValue(of('testNonce'));
       const createCodeVerifierSpy = spyOn(
         flowsDataService,
         'createCodeVerifier'
@@ -1464,7 +1464,7 @@ describe('UrlService Tests', () => {
         flowsDataService,
         'getExistingOrCreateAuthStateControl'
       ).and.returnValue(state);
-      spyOn(flowsDataService, 'createNonce').and.returnValue(nonce);
+      spyOn(flowsDataService, 'createNonce').and.returnValue(of(nonce));
 
       const config = {
         silentRenewUrl,
@@ -1526,7 +1526,7 @@ describe('UrlService Tests', () => {
         flowsDataService,
         'getExistingOrCreateAuthStateControl'
       ).and.returnValue(state);
-      spyOn(flowsDataService, 'createNonce').and.returnValue(nonce);
+      spyOn(flowsDataService, 'createNonce').and.returnValue(of(nonce));
 
       spyOn(storagePersistenceService, 'read')
         .withArgs('authWellKnownEndPoints', config)
@@ -1551,7 +1551,7 @@ describe('UrlService Tests', () => {
         flowsDataService,
         'getExistingOrCreateAuthStateControl'
       ).and.returnValue(state);
-      spyOn(flowsDataService, 'createNonce').and.returnValue(nonce);
+      spyOn(flowsDataService, 'createNonce').and.returnValue(of(nonce));
       spyOn(flowsDataService, 'createCodeVerifier').and.returnValue(
         codeVerifier
       );
@@ -1699,7 +1699,7 @@ describe('UrlService Tests', () => {
         flowsDataService,
         'getExistingOrCreateAuthStateControl'
       ).and.returnValue(state);
-      spyOn(flowsDataService, 'createNonce').and.returnValue(nonce);
+      spyOn(flowsDataService, 'createNonce').and.returnValue(of(nonce));
 
       spyOn(storagePersistenceService, 'read')
         .withArgs('authWellKnownEndPoints', config)
@@ -1723,7 +1723,7 @@ describe('UrlService Tests', () => {
         flowsDataService,
         'getExistingOrCreateAuthStateControl'
       ).and.returnValue(state);
-      spyOn(flowsDataService, 'createNonce').and.returnValue(nonce);
+      spyOn(flowsDataService, 'createNonce').and.returnValue(of(nonce));
       spyOn(storagePersistenceService, 'read')
         .withArgs('authWellKnownEndPoints', config)
         .and.returnValue(null);
@@ -1748,7 +1748,7 @@ describe('UrlService Tests', () => {
         flowsDataService,
         'getExistingOrCreateAuthStateControl'
       ).and.returnValue(state);
-      spyOn(flowsDataService, 'createNonce').and.returnValue(nonce);
+      spyOn(flowsDataService, 'createNonce').and.returnValue(of(nonce));
 
       const serviceAsAny = service as any;
       const resultObs$ = serviceAsAny.createUrlCodeFlowAuthorize(config);

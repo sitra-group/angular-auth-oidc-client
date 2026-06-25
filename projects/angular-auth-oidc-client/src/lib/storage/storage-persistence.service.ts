@@ -9,6 +9,7 @@ export type StorageKeys =
   | 'access_token_expires_at'
   | 'authWellKnownEndPoints'
   | 'userData'
+  | 'rawNonce'
   | 'authNonce'
   | 'codeVerifier'
   | 'authStateControl'
@@ -83,6 +84,10 @@ export class StoragePersistenceService {
 
   getNonce(config: OpenIdConfiguration): string {
     return this.read('authNonce', config);
+  }
+
+  getRawNonce(config: OpenIdConfiguration): string {
+    return this.read('rawNonce', config);
   }
 
   getRefreshToken(config: OpenIdConfiguration): string {
