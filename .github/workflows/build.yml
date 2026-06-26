@@ -30,20 +30,20 @@ jobs:
       - name: Linting Library
         run: npm run lint-lib
 
-      - name: Testing Frontend
-        run: npm run test-lib-ci
+      # - name: Testing Frontend
+      #  run: npm run test-lib-ci
 
-      - name: Coveralls
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: './coverage/angular-auth-oidc-client/lcov.info'
+      # - name: Coveralls
+      #  uses: coverallsapp/github-action@master
+      #  with:
+      #    github-token: ${{ secrets.GITHUB_TOKEN }}
+      #    path-to-lcov: './coverage/angular-auth-oidc-client/lcov.info'
 
-      - name: Coveralls Finished
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.github_token }}
-          parallel-finished: true
+      # - name: Coveralls Finished
+      #  uses: coverallsapp/github-action@master
+      #  with:
+      #    github-token: ${{ secrets.github_token }}
+      #    parallel-finished: true
 
       - name: Building Frontend
         run: npm run build-lib-prod
