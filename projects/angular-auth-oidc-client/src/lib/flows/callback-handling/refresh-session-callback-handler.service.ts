@@ -3,7 +3,6 @@ import { Observable, of, throwError } from 'rxjs';
 import { AuthStateService } from '../../auth-state/auth-state.service';
 import { OpenIdConfiguration } from '../../config/openid-configuration';
 import { LoggerService } from '../../logging/logger.service';
-import { TokenValidationService } from '../../validation/token-validation.service';
 import { CallbackContext } from '../callback-context';
 import { FlowsDataService } from '../flows-data.service';
 
@@ -45,11 +44,11 @@ export class RefreshSessionCallbackHandlerService {
         'found refresh code, obtaining new credentials with refresh code'
       );
       // Nonce is not used with refresh tokens; but Key cloak may send it anyway
-      this.flowsDataService.setNonce(
-        '',
-        TokenValidationService.refreshTokenNoncePlaceholder,
-        config
-      );
+      // this.flowsDataService.setNonce(
+      //   '',
+      //   TokenValidationService.refreshTokenNoncePlaceholder,
+      //   config
+      // );
 
       return of(callbackContext);
     } else {
